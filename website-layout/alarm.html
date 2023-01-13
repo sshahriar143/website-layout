@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Alarm Clock</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+var alarm_set = false;
+var hour = 0;
+var minute = 0;
+
+function alarm_loop(){
+    if(alarm_set){
+        var current_time = new Date();
+        if(current_time.getHours() == hour && current_time.getMinutes() == minute){
+            $('#buzzer')[0].play();
+            $('#alarm-time').val('');
+            $('p').html('');
+            alarm_set = false;
+        } else {
+            setTimeout('alarm_loop()',1000);
+        }
+    }
+}
+
+$(function(){
+    $('#play').on('click',function(){
+        $('#buzzer')[0].play();
+    });
+    $('#pause').on('click',function(){
+        $('#buzzer')[0].pause();
+    });
+    $('#alarm-time').on('keypress',function(){
+        $('p').html('');
+    });
+    $('#set-alarm').on('click',function(){
+        var alarm_val = $('#alarm-time').val();
+        if(alarm_val.length > 0){
+            if(alarm_val.indexOf(':') > -1){
+                var alarm_time = alarm_val.split(':');
+                hour = parseInt(alarm_time[0]);
+                minute = parseInt(alarm_time[1]);
+                alarm_set = true;
+            } else if(!isNaN(alarm_val)){
+                var num = parseInt(alarm_val);
+                if(0 < num && num < 24){
+                    hour = num;
+                    minute = 0;
+                    alarm_set = true;
+                } else {
+                    $('p').html('<b><font color="red">Invalid input.</font></b>');
+                }
+            }
+            $('p').html('<b><font color="red">Alarm set for ' + (hour <= 9 ? '0' : '') + hour + ':' + (minute <= 9 ? '0' : '') + minute + '!');
+            alarm_loop();
+        } else {
+            $('p').html('<b><font color="red">Invalid input.</font></b>');
+        }
+    });
+});
+</script>
+</head>
+<body>
+<h2>Alarm Clock</h2>
+<audio id="buzzer" src="UVB-76.ogg" type="audio/ogg">Your browser does not support the &#60;audio&#62; element.</audio>
+Specify a time (hh:mm) to ring: <input type="text" id="alarm-time" size="5"> <input type="button" id="set-alarm" value="Set Alarm">
+<input type="button" id="play" value="Play"><input type="button" id="pause" value="Pause">
+<p>&nbsp;</p>
+</body>
+</html>
